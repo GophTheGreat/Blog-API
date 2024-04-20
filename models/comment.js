@@ -3,6 +3,7 @@ const { DateTime } = require("luxon");
 
 const CommentSchema = new Schema({
   hidden: {type: Boolean, required, default: false},
+  username: {type: String, required, default: "anonymous"},
   content: {type: String, required},
   timestamp: {type: Date, default: Date.now()}
 })

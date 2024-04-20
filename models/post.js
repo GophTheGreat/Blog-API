@@ -5,6 +5,7 @@ const PostSchema = new Schema({
   title: {type: String, required},
   public: {type: Boolean, required, default: true},
   content: {type: String, required},
+  hidden: {type: Boolean, required, default: false},
   datepublished: {type: Date, default: Date.now()},
   datewritten: {type: Date, default: Date.now()}
 })

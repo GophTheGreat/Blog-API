@@ -1,12 +1,11 @@
+const routes = require("./routes/index")
+
 require('dotenv').config();
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 
 var app = express();
 
@@ -20,8 +19,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/users', routes.users);
+app.use('/posts', routes.posts);
+app.use('/comments', routes.comments);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -38,5 +38,9 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+app.listen(process.env.PORT, () =>
+  console.log(`Example app listening on port ${process.env.PORT}!`),
+);
 
 module.exports = app;
