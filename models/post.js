@@ -1,13 +1,15 @@
 const mongoose = require("mongoose");
 const { DateTime } = require("luxon");
 
+const Schema = mongoose.Schema;
+
 const PostSchema = new Schema({
-  title: {type: String, required},
-  public: {type: Boolean, required, default: true},
-  content: {type: String, required},
-  hidden: {type: Boolean, required, default: false},
-  datepublished: {type: Date, default: Date.now()},
-  datewritten: {type: Date, default: Date.now()}
+  title: {type: String, required: true},
+  public: {type: Boolean, required: true, default: true},
+  content: {type: String, required: true},
+  hidden: {type: Boolean, required: true, default: false},
+  datepublished: {type: Date, default: Date.now},
+  datewritten: {type: Date, default: Date.now}
 })
 
 PostSchema.virtual("datepublished_formatted").get(function () {
@@ -18,4 +20,4 @@ PostSchema.virtual("datewritten_formatted").get(function () {
   return DateTime.fromJSDate(this.datewritten).toISODate(); // format 'YYYY-MM-DD'
 });
 
-module.exports(mongoose.model("Post", PostSchema));
+module.exports = mongoose.model("Post", PostSchema);

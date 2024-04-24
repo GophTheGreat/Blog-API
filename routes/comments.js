@@ -2,21 +2,25 @@ const { Router } = require('express');
 
 const router = Router();
 
+//Comment routes
+////GET all comments
 router.get('/', (req, res) => {
   res.send('Received a GET HTTP method');
 });
 
-router.post('/', (req, res) => {
+////POST comment
+router.post('/api/comments', (req, res) => {
   res.send('Received a POST HTTP method');
 });
 
-router.put('/:commentid', (req, res) => {
+////PUT comment
+router.put('/api/comments/:commentid', (req, res) => {
   res.send('Received a PUT HTTP method');
 });
 
-router.delete('/:commentid', (req, res) => {
+////DELETE comment
+router.delete('/api/comments/:commentid', (req, res) => {
   res.send('Received a DELETE HTTP method');
 });
-
 
 module.exports = router;
