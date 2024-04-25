@@ -13,13 +13,9 @@ router.post('/', post_controller.posts_post);
 router.get('/:postid', post_controller.posts_getOne)
 
 ////PUT post
-router.put('/:postid', (req, res) => {
-  res.send('Received a PUT HTTP method');
-});
+router.put('/:postid', post_controller.posts_modify);
 
 ////DELETE post
-router.delete('/:postid', (req, res) => {
-  res.send('Received a DELETE HTTP method');
-});
+router.delete('/:postid', post_controller.posts_delete);
 
 module.exports = router;

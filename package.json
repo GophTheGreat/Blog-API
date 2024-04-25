@@ -21,6 +21,7 @@
     "pug": "^3.0.2"
   },
   "devDependencies": {
-    "core-js": "^3.37.0"
+    "core-js": "^3.37.0",
+    "jest": "^29.7.0"
   }
 }
