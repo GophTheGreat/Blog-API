@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const CommentSchema = new Schema({
   hidden: {type: Boolean, required, default: false},
-  username: {type: String, required, default: "anonymous"},
+  author: {type: Schema.Types.ObjectId, ref: "User", required: true},
   content: {type: String, required},
   timestamp: {type: Date, default: Date.now()}
 })

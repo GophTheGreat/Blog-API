@@ -23,7 +23,7 @@ exports.comment_post = asyncHandler(async(req, res, next) => {
   
   const newComment = new Comment({
     hidden: false,
-    username: req.body.username,
+    author: req.user,
     content: req.body.content,
     timestamp: Date.now()
   })
@@ -38,8 +38,27 @@ exports.comment_post = asyncHandler(async(req, res, next) => {
 });
 
 //updates a comment
+exports.comments_modify = asyncHandler(async (req, res, next) => {
+  const commentID = req.params.id;
+  const update = req.body;
+  const updatedComment = await Comment.findByIdAndUpdate(commentID, update, {new: true});
+
+  if (!updatedComment) {
+    return res.status(404).json({success: false, message: 'Comment not found'})
+  }
+
+  res.status(200).json(updatedComment)
+})
 
 //deletes a comment
+exports.comments_delete = asyncHandler(async (req, res, next) => {
+  const deletedComment = await Comment.findByIdAndDelete(req.params.id);
+
+  if(!deletedComment){
+    res.status(404).json({success: false, message: 'Comment not found'})
+  }
+  res.status(200).json(deletedComment);
+})
 
 // hidden: {type: Boolean, required, default: false},
 // username: {type: String, required, default: "anonymous"},

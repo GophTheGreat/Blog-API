@@ -30,12 +30,11 @@ exports.posts_post = asyncHandler(async (req, res, next) => {
     content: req.body.content,
     hidden: req.body.hidden,
     datepublished: req.body.datepublished,
-    datewritten: Date.now();
+    datewritten: Date.now()
   })
 
   try {
     const savedPost = await newPost.save();
-
     res.status(201).json(savedPost);
   } catch (error) {
     console.error(error);
@@ -45,8 +44,10 @@ exports.posts_post = asyncHandler(async (req, res, next) => {
 
 //modify an existing post
 exports.posts_modify = asyncHandler(async (req, res, next) => {
+  //TODO an authentication step for the user. Use JWTs? jsonwebtokens?
+  
   const postID = req.params.id;
-  const update = req.body
+  const update = req.body;
   const updatedPost = await Post.findByIdAndUpdate(postID, update, {new: true});
 
   if (!updatedPost) {

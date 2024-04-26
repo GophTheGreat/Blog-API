@@ -6,6 +6,11 @@
     "start": "node ./bin/www",
     "serverstart": "nodemon ./bin/www"
   },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./jest.setup.js"
+    ]
+  },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cookie-parser": "~1.4.4",
@@ -13,11 +18,16 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-async-handler": "^1.2.0",
+    "express-session": "^1.18.0",
     "http-errors": "~1.6.3",
+    "jsonwebtoken": "^9.0.2",
     "luxon": "^3.4.4",
     "mongoose": "^8.3.2",
     "morgan": "~1.9.1",
     "nodemon": "^3.1.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
     "pug": "^3.0.2"
   },
   "devDependencies": {

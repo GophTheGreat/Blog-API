@@ -7,6 +7,12 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const User = require('./models/user');
+const bcrypt = require('bcrypt');
+const session = require("express-session");
+
 var app = express();
 
 const mongodb = process.env.MONGO;
@@ -47,6 +53,38 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+passport.use(
+  new LocalStrategy(async (username, password, done) => {
+    try {
+      const user = await User.findOne({username: username});
+      const match = await bcrypt.compare(password, user.password);
+
+      if(!user) {
+        return done(null, false, {message: "Incorrect username"})
+      }
+      if(!match){
+        return done(null, false, {message: "Incorrect Password"})
+      }
+      return done(null, user);
+    } catch (error) {
+      return done(error);
+    }
+  })
+)
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch(err) {
+    done(err);
+  };
 });
 
 module.exports = app;
