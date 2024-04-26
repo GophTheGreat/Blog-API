@@ -15,7 +15,7 @@ exports.users_login = asyncHandler(async (req, res, next) => {
         if(error) return next(error);
         
         const body = {_id: user._id}
-        const token = jwt.sign({user: body}, process.env.TOKEN)
+        const token = jwt.sign({user: body}, process.env.SECRETKEY)
         return res.json({token});
       })
     } catch (err){

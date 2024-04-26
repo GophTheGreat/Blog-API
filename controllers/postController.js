@@ -1,5 +1,6 @@
 const Post = require('../models/post')
 const asyncHandler = require("express-async-handler");
+const passport = require("passport");
 
 //return a JSON object of all posts
 exports.posts_getAll = asyncHandler(async (req, res, next) => {
@@ -21,29 +22,34 @@ exports.posts_getOne = asyncHandler(async (req, res, next) => {
 //create a new post from a JSON object
 exports.posts_post = passport.authenticate('jwt', {session: false}, asyncHandler(async (req, res, next) => {
 
-  console.log(req.body);
+  const allowedUserId = '123';
+  if(req.user && req.user.userId === allowedUserId) {
+    console.log(req.body);
 
-  const newPost = new Post({
-    title: req.body.title,
-    public: req.body.public,
-    content: req.body.content,
-    hidden: req.body.hidden,
-    datepublished: req.body.datepublished,
-    datewritten: Date.now()
-  })
-
-  try {
-    const savedPost = await newPost.save();
-    res.status(201).json(savedPost);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({error: 'Internal Server Error'});
+    const newPost = new Post({
+      title: req.body.title,
+      public: req.body.public,
+      content: req.body.content,
+      hidden: req.body.hidden,
+      datepublished: req.body.datepublished,
+      datewritten: Date.now()
+    })
+  
+    try {
+      const savedPost = await newPost.save();
+      res.status(201).json(savedPost);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({error: 'Internal Server Error'});
+    }
+  } else {
+    res.status(403).json({error: 'Forbodden: You are not authorized to create posts'})
   }
 }));
 
 //modify an existing post
 exports.posts_modify = passport.authenticate('jwt', {session: false}, asyncHandler(async (req, res, next) => {
-  //TODO an authentication step for the user. Use JWTs? jsonwebtokens?
+  //passport.authenticate middleware automatically checks the token
 
   const postID = req.params.id;
   const update = req.body;
