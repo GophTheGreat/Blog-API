@@ -1,8 +1,11 @@
-const postController = require ('../controllers/postController')
-const Post = require('../models/post')
+const postController = require ('../controllers/postController');
+const Post = require('../models/post');
+const app = require('../app');
+const JWT = require('jsonwebtoken');
 
 describe('postController', () => {
   let postIds = [];
+  const token = jwt.s
   describe('posts_post', () => {
     it('makes a new post', async() => {
       const post1 = new Post({

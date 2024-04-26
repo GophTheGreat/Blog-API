@@ -12,6 +12,8 @@ const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/user');
 const bcrypt = require('bcrypt');
 const session = require("express-session");
+const JWTStrategy = require('passport-jwt').Strategy;
+const ExtractJWT = require('passport-jwt').ExtractJWT;
 
 var app = express();
 
@@ -86,5 +88,20 @@ passport.deserializeUser(async (id, done) => {
     done(err);
   };
 });
+
+passport.use(
+  new JWTStrategy(
+  {
+    secretOrKey: process.env.TOKEN,
+    jwtFromRequest: ExtractJWT.fromUrlQueryParameter('secret_token')
+  },
+  async(token, done) => {
+    try{
+      return done(null, token.user);
+    } catch (error) {
+      done(error);
+    }
+  })
+)
 
 module.exports = app;

@@ -19,8 +19,7 @@ exports.posts_getOne = asyncHandler(async (req, res, next) => {
 })
 
 //create a new post from a JSON object
-exports.posts_post = asyncHandler(async (req, res, next) => {
-  //TODO an authentication step for the user. Use JWTs? jsonwebtokens?
+exports.posts_post = passport.authenticate('jwt', {session: false}, asyncHandler(async (req, res, next) => {
 
   console.log(req.body);
 
@@ -40,12 +39,12 @@ exports.posts_post = asyncHandler(async (req, res, next) => {
     console.error(error);
     res.status(500).json({error: 'Internal Server Error'});
   }
-});
+}));
 
 //modify an existing post
-exports.posts_modify = asyncHandler(async (req, res, next) => {
+exports.posts_modify = passport.authenticate('jwt', {session: false}, asyncHandler(async (req, res, next) => {
   //TODO an authentication step for the user. Use JWTs? jsonwebtokens?
-  
+
   const postID = req.params.id;
   const update = req.body;
   const updatedPost = await Post.findByIdAndUpdate(postID, update, {new: true});
@@ -55,7 +54,7 @@ exports.posts_modify = asyncHandler(async (req, res, next) => {
   }
 
   res.status(200).json(updatedPost);
-})
+}));
 
 //delete a post
 exports.posts_delete = asyncHandler(async (req, res, next) => {
