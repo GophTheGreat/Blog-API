@@ -5,7 +5,7 @@ const JWT = require('jsonwebtoken');
 
 describe('postController', () => {
   let postIds = [];
-  const token = jwt.s
+  const token = jwt.sign({ userID: '123'}, )
   describe('posts_post', () => {
     it('makes a new post', async() => {
       const post1 = new Post({

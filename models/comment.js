@@ -4,14 +4,14 @@ const { DateTime } = require("luxon");
 const Schema = mongoose.Schema;
 
 const CommentSchema = new Schema({
-  hidden: {type: Boolean, required, default: false},
+  hidden: {type: Boolean, required: true, default: false},
   author: {type: Schema.Types.ObjectId, ref: "User", required: true},
-  content: {type: String, required},
+  content: {type: String, required: true},
   timestamp: {type: Date, default: Date.now()}
 })
 
-PostSchema.virtual("timestamp_formatted").get(function () {
+CommentSchema.virtual("timestamp_formatted").get(function () {
   return DateTime.fromJSDate(this.timestamp).toISODate(); // format 'YYYY-MM-DD'
 });
 
-module.exports(mongoose.model("Comment", CommentSchema));
+module.exports = mongoose.model("Comment", CommentSchema);

@@ -13,7 +13,7 @@ const User = require('./models/user');
 const bcrypt = require('bcrypt');
 const session = require("express-session");
 const JWTStrategy = require('passport-jwt').Strategy;
-const ExtractJWT = require('passport-jwt').ExtractJWT;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
 
 var app = express();
 
@@ -93,7 +93,7 @@ passport.use(
   new JWTStrategy(
   {
     secretOrKey: process.env.TOKEN,
-    jwtFromRequest: ExtractJWT.fromUrlQueryParameter('secret_token')
+    jwtFromRequest: ExtractJwt.fromUrlQueryParameter('secret_token')
   },
   async(token, done) => {
     try{
