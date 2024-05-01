@@ -70,7 +70,7 @@ exports.users_login = asyncHandler(async (req, res, next) => {
         
         const body = {_id: user._id}
         const token = jwt.sign({user: body}, process.env.SECRETKEY)
-        return res.json({token});
+        return res.status(200).json({token});
       })
     } catch (err){
       return next(err);
@@ -78,12 +78,13 @@ exports.users_login = asyncHandler(async (req, res, next) => {
   })(req, res, next);
 });
 
-//GET for logging out
+//POST for logging out
 exports.users_logout = asyncHandler((req, res, next) => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-  });
+    req.logout((err) => {
+      if (err) {
+        return next(err);
+      };
+    })// Terminate the login session
+    res.status(200).send("Logged out successfully"); // Respond with a success message
 });
 

@@ -17,7 +17,7 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 
 var app = express();
 
-const mongodb = process.env.MONGO;
+const mongodb = process.env.NODE_ENV === 'test' ? process.env.TESTDB : process.env.MONGO;
 const mongoose = require("mongoose");
 const db = mongoose.connection;
 
@@ -36,6 +36,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(session({
+  secret: process.env.SECRETKEY,
+  resave: false,
+  saveUninitialized: true
+}))
+
+app.use(passport.session());
 
 app.use('/api/users', routes.users);
 app.use('/api/posts', routes.posts);
@@ -92,7 +100,7 @@ passport.deserializeUser(async (id, done) => {
 passport.use(
   new JWTStrategy(
   {
-    secretOrKey: process.env.TOKEN,
+    secretOrKey: process.env.SECRETKEY,
     jwtFromRequest: ExtractJwt.fromUrlQueryParameter('secret_token')
   },
   async(token, done) => {
