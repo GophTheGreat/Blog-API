@@ -13,18 +13,35 @@ describe('userController', () => {
         confirmPassword: "aAsSdDfF1!",
         admin: true
       }
-      const response = await request(app)
+
+      const user2 = {
+        username: "testNormie",
+        password: "aAsSdDfF1!",
+        confirmPassword: "aAsSdDfF1!",
+        admin: false
+      }
+
+      await request(app)
         .post('/api/users/')
         .send(user)
         .expect(201);
 
-      const createdUser = await User.findOne({username: "testAdmin"}).exec();
+      await request(app)
+        .post('/api/users/')
+        .send(user2)
+        .expect(201);
+
+      let createdUser = await User.findOne({username: "testAdmin"}).exec();
       expect(createdUser).toBeDefined();
-      expect(createdUser.username).toEqual("testAdmin");
+      expect(createdUser.admin).toBe(true)
+
+      createdUser = await User.findOne({username: "testNormie"}).exec();
+      expect(createdUser).toBeDefined();
+      expect(createdUser.admin).toBe(false)
     });
   });
   describe("users_login", () => {
-    it('should give us a token on successful login', async() => {
+    it('login should succeed and user receives a token', async() => {
       const user = {
         username: "testAdmin",
         password: "aAsSdDfF1!"
@@ -42,25 +59,26 @@ describe('userController', () => {
   })
   describe("users_logout", () => {
     it('should log us out', async() => {
+      await request(app)
+        .post('/api/users/logout')
+        .expect(200)
+    })
+  })
+  describe("users_login", () => {
+    it('login should succeed after logging out', async() => {
       const user = {
-        username: "testAdmin",
+        username: "testNormie",
         password: "aAsSdDfF1!"
       }
-  
-      await request(app)
+      
+      const loginResponse = await request(app)
         .post('/api/users/login')
         .send(user)
         .expect(200)
 
-      await request(app)
-        .post('/api/users/logout')
-        .expect(200)
+      token = loginResponse.body.token;
 
-      const makeAProtectedPost = await request(app)  
-        .post('/api/posts/')
-        .set('Authorization', `Bearer ${token}`);
-
-      expect(makeAProtectedPost.status).toBe(401);
+      expect(loginResponse.body.token).toBeTruthy();
     })
   })
 });

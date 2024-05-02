@@ -64,14 +64,8 @@ exports.users_login = asyncHandler(async (req, res, next) => {
         const error = new Error('An error occurred');
         return next(error);
       }
-
-      req.login(user, {session: false}, async (error) => {
-        if(error) return next(error);
-        
-        const body = {_id: user._id}
-        const token = jwt.sign({user: body}, process.env.SECRETKEY)
-        return res.status(200).json({token});
-      })
+      const token = jwt.sign({user: body}, process.env.SECRETKEY)
+      return res.status(200).json({ token });
     } catch (err){
       return next(err);
     }
@@ -84,7 +78,7 @@ exports.users_logout = asyncHandler((req, res, next) => {
       if (err) {
         return next(err);
       };
-    })// Terminate the login session
-    res.status(200).send("Logged out successfully"); // Respond with a success message
+      res.status(200).send("Logged out successfully"); // Respond with a success message
+    })
 });
 
