@@ -16,16 +16,21 @@ exports.posts_getAll = asyncHandler(async (req, res, next) => {
 //return a JSON object of one post
 exports.posts_getOne = asyncHandler(async (req, res, next) => {
   //retrieve the one post from the db corresponding to the id
-  res.json(await Post.findById(req.params.id));
+  console.log(`in the middleware the id is `,req.params.id)
+  let post = await Post.findById(req.params.id).exec();
+  console.log(`this bet he post: `,post)
+  res.json(post);
 })
 
-//create a new post from a JSON object
-exports.posts_post = passport.authenticate('jwt', {session: false}, asyncHandler(async (req, res, next) => {
+//create a new post from a JSON object passport.authenticate('jwt', {session: false}, 
+exports.posts_post = async (req, res, next) => {
+  // Check if req.user is null
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized: Missing or invalid token' });
+  }
 
-  const allowedUserId = '123';
-  if(req.user && req.user.userId === allowedUserId) {
-    console.log(req.body);
-
+  if (req.user.admin === true){
+    //Create a new post object
     const newPost = new Post({
       title: req.body.title,
       public: req.body.public,
@@ -43,14 +48,13 @@ exports.posts_post = passport.authenticate('jwt', {session: false}, asyncHandler
       res.status(500).json({error: 'Internal Server Error'});
     }
   } else {
+    console.log("User is not an admin!")
     res.status(403).json({error: 'Forbodden: You are not authorized to create posts'})
   }
-}));
+};
 
 //modify an existing post
-exports.posts_modify = passport.authenticate('jwt', {session: false}, asyncHandler(async (req, res, next) => {
-  //passport.authenticate middleware automatically checks the token
-
+exports.posts_modify = asyncHandler(async (req, res, next) => {
   const postID = req.params.id;
   const update = req.body;
   const updatedPost = await Post.findByIdAndUpdate(postID, update, {new: true});
@@ -59,8 +63,8 @@ exports.posts_modify = passport.authenticate('jwt', {session: false}, asyncHandl
     return res.status(404).json({ success: false, message: 'Post not found' });
   }
 
-  res.status(200).json(updatedPost);
-}));
+  res.status(201).json(updatedPost);
+});
 
 //delete a post
 exports.posts_delete = asyncHandler(async (req, res, next) => {

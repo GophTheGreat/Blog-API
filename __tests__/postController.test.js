@@ -1,66 +1,92 @@
 const postController = require ('../controllers/postController');
 const Post = require('../models/post');
+const User = require('../models/user');
+const request = require('supertest');
 const app = require('../app');
-const JWT = require('jsonwebtoken');
 
 describe('postController', () => {
-  let postIds = [];
-  const token = jwt.sign({ userID: '123'}, )
+  let adminToken;
+  let post2id;
   describe('posts_post', () => {
-    it('makes a new post', async() => {
-      const post1 = new Post({
-        title: 'Test Post 1', 
-        content: 'Content 1', 
-        datewritten: Date.now(), 
-        datepublished: Date.now()
-      });
+    beforeAll(async() => {
+      let admin = await User.findOne({username: "testAdmin"}).exec()
+      //If there's no admin account, create one and log in
+      if(!admin) {
+        console.log('No admin account. Creating')
+        admin = {        
+          username: "testAdmin",
+          password: "aAsSdDfF1!",
+          confirmPassword: "aAsSdDfF1!",
+          admin: true
+        };
+        await request(app)
+          .post('/api/users/')
+          .send(admin)
+          .expect(201);
+      };
+      const token = await request(app)
+        .post('/api/users/login')
+        .send({
+          username: "testAdmin",
+          password: "aAsSdDfF1!",
+        })
+        .expect(200)
+      adminToken = token.body.token;
+    })
 
-      const post2 = new Post({
-        title: 'Test Post 2', 
-        content: 'Content 2', 
-        datewritten: Date.now(), 
-        datepublished: Date.now()
-      });
+    it('makes several new posts', async() => {
 
-      const post3 = new Post({
-        title: 'Test Post 3', 
-        content: 'Content 3',
-        datewritten: Date.now(), 
-        datepublished: Date.now()
-      });
-
-      let req = {body: post1};
-      let res = {status: jest.fn().mockReturnThis(), json: jest.fn()};
-      await postController.posts_post(req, res);
-      postIds.push(res.json.mock.calls[0][0]._id);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
+      console.log(`My admin token is still: `+adminToken);
+      let res = await request(app)
+        .post('/api/posts')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
           title: 'Test Post 1', 
           content: 'Content 1', 
+          datewritten: Date.now(), 
+          datepublished: Date.now()
         })
-      );
+        .expect(201);
 
-      req = {body: post2};
-      res = {status: jest.fn().mockReturnThis(), json: jest.fn()};
-      await postController.posts_post(req, res);
-      postIds.push(res.json.mock.calls[0][0]._id);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
+      expect(res.body).toEqual(expect.objectContaining({
+        title: 'Test Post 1',
+        content: 'Content 1'
+      }));
+
+      res = await request(app)
+        .post('/api/posts')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
           title: 'Test Post 2', 
           content: 'Content 2', 
+          datewritten: Date.now(), 
+          datepublished: Date.now()
         })
-      );
+        .expect(201);
 
-      req = {body: post3};
-      res = {status: jest.fn().mockReturnThis(), json: jest.fn()};
-      await postController.posts_post(req, res);
-      postIds.push(res.json.mock.calls[0][0]._id);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
+      post2id = res.body._id;
+      console.log(`post 2's title is:`,res.body.title);
+
+      expect(res.body).toEqual(expect.objectContaining({
+        title: 'Test Post 2',
+        content: 'Content 2'
+      }));
+
+      res = await request(app)
+        .post('/api/posts')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
           title: 'Test Post 3', 
-          content: 'Content 3',
+          content: 'Content 3', 
+          datewritten: Date.now(), 
+          datepublished: Date.now()
         })
-      );
+        .expect(201);
+
+      expect(res.body).toEqual(expect.objectContaining({
+        title: 'Test Post 3',
+        content: 'Content 3'
+      }));
     });
   });
   describe('posts_getAll', () => {
@@ -79,59 +105,43 @@ describe('postController', () => {
   });
   describe('posts_getOne', () => {
     it('should return post 2', async() => {
-      const postId = postIds[1];
-      
-      const req = {params: {id: postId}};
-      const res = {json: jest.fn()};
-      await postController.posts_getOne(req, res);
+      console.log(post2id);
+      const response = await request(app)
+        .get(`/api/posts/${post2id}`)
 
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({title: 'Test Post 2', content: 'Content 2'}));
-    })
+      console.log('this should be post 2: ', response.body)
+      expect(response.body).toEqual(expect.objectContaining({title: 'Test Post 2', content: 'Content 2'}));
+    });
   })
   describe('posts_modify', () => {
     it(`should change post 2's content`, async() => {
-      const postId = postIds[1];
-      let req = {params: {id: postId}, body: {
-        content: 'Content 2 modified'
-      }};
-      let res = {status: jest.fn().mockReturnThis(), json: jest.fn()};
-      await postController.posts_modify(req, res);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: 'Test Post 2', 
+      await request(app)
+        .put(`/api/posts/${post2id}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          title: 'Test Post 2 modified', 
           content: 'Content 2 modified', 
         })
-      )
-      req = {params: {id: postId}};
-      res = {json: jest.fn()};
-      await postController.posts_getOne(req, res);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: 'Test Post 2', 
-          content: 'Content 2 modified'
-        })
-      );
+        .expect(201);
+
+      let response = await Post.findOne({title: "Test Post 2 modified"}).exec();
+      expect(response).toEqual(expect.objectContaining({title: 'Test Post 2 modified', content: 'Content 2 modified'}));
+
     })
   })
   describe('posts_delete', () => {
     it('should delete post 2', async() => {
-      const postId = postIds[1];
       
-      let req = {params: {id: postId}};
-      let res = {status: jest.fn().mockReturnThis(), json: jest.fn()};
-      await postController.posts_delete(req, res);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: 'Test Post 2', 
-          content: 'Content 2 modified', 
-        })
-      )
+      await request(app)
+        .delete(`/api/posts/${post2id}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
 
       req = {};
       res = {json: jest.fn()};
       await postController.posts_getAll(req, res)
       expect(res.json).toHaveBeenCalledWith(expect.not.arrayContaining([
-        expect.objectContaining({title: 'Test Post 2', content: 'Content 2 modified' }),
+        expect.objectContaining({title: 'Test Post 2 modified', content: 'Content 2 modified' }),
       ]));
     });
   })

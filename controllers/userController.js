@@ -30,7 +30,6 @@ exports.users_create = [
   asyncHandler(async (req, res, next) => {
     //Extract the validation errors from the request
     const errors = validationResult(req);
-    console.log("Request Body:", req.body)
 
     //Password will be hashed pre-save
     const newUser = new User({
@@ -49,7 +48,6 @@ exports.users_create = [
       //Data from the request is valid
       const savedUser = await newUser.save();
       res.status(201).json(savedUser)
-      console.log(savedUser);
     } catch (error){
       //Handle database errors
       return next(error);
@@ -64,7 +62,7 @@ exports.users_login = asyncHandler(async (req, res, next) => {
         const error = new Error('An error occurred');
         return next(error);
       }
-      const token = jwt.sign({user: body}, process.env.SECRETKEY)
+      const token = jwt.sign({user}, process.env.SECRETKEY)
       return res.status(200).json({ token });
     } catch (err){
       return next(err);

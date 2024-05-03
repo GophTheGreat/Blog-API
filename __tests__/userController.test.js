@@ -79,6 +79,9 @@ describe('userController', () => {
       token = loginResponse.body.token;
 
       expect(loginResponse.body.token).toBeTruthy();
+      await request(app)
+        .post('/api/users/logout')
+        .expect(200);
     })
   })
 });
