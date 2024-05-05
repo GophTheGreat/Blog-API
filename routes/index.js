@@ -1,9 +1,10 @@
 const users = require("./users");
-const posts = require("./posts");
 const comments = require("./comments");
+const posts = require("./posts");
+
 
 module.exports = {
   users,
+  comments,
   posts,
-  comments
 }

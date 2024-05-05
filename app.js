@@ -89,7 +89,7 @@ passport.use(
 
 app.use('/api/users', routes.users);
 app.use('/api/posts', routes.posts);
-app.use('/api/comments', routes.comments);
+app.use('/api/posts/:postId/comments', routes.comments);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

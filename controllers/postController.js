@@ -1,6 +1,5 @@
 const Post = require('../models/post')
 const asyncHandler = require("express-async-handler");
-const passport = require("passport");
 
 //return a JSON object of all posts
 exports.posts_getAll = asyncHandler(async (req, res, next) => {

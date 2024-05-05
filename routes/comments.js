@@ -1,21 +1,25 @@
 const { Router } = require('express');
 const router = Router();
+const passport = require('passport');
 const comment_controller = require('../controllers/commentController');
 
-// //Comment routes
-// ////GET all comments
-// router.get('/', comment_controller.comments_getAll);
+const authenticateJWT = passport.authenticate('jwt', { session: false });
 
-// ////POST comment
-// router.post('/', comment_controller.comments_post);
+//Comment routes
 
-// ////GET single comment
-// router.post('/', comment_controller.comments_getOne);
+////GET all comments
+router.get('/', comment_controller.comments_getAll);
 
-// ////PUT comment
-// router.put('/:commentid', comment_controller.comments_modify);
+////POST comment
+router.post('/', authenticateJWT, comment_controller.comments_post);
 
-// ////DELETE comment
-// router.delete('/:commentid', comment_controller.comments_delete);
+////GET single comment
+router.post('/:commentId', comment_controller.comments_getOne);
+
+////PUT comment
+router.put('/:commentId', comment_controller.comments_modify);
+
+////DELETE comment
+router.delete('/:commentId', comment_controller.comments_delete);
 
 module.exports = router;

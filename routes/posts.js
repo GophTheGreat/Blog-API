@@ -6,6 +6,7 @@ const post_controller = require('../controllers/postController')
 const authenticateJWT = passport.authenticate('jwt', { session: false });
 
 //Post routes
+
 ////GET all posts
 router.get('/', post_controller.posts_getAll);
 
@@ -19,6 +20,6 @@ router.get('/:id', post_controller.posts_getOne)
 router.put('/:id', authenticateJWT, post_controller.posts_modify);
 
 ////DELETE post
-router.delete('/:id', post_controller.posts_delete);
+router.delete('/:id', authenticateJWT, post_controller.posts_delete);
 
 module.exports = router;
