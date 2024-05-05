@@ -44,8 +44,11 @@ export const comments_post: AsyncRequestHandler = asyncHandler(async(req: Reques
     timestamp: Date.now()
   })
 
+  console.log(newComment)
+
   try {
     const savedComment = await newComment.save();
+    console.log("comment was saved!", savedComment)
     res.status(201).json(savedComment);
   } catch (error) {
     console.error(error);
