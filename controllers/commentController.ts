@@ -16,7 +16,7 @@ interface RequestWithUser extends ExpressRequest{
 //returns a JSON object of all comments
 export const comments_getAll: AsyncRequestHandler = asyncHandler(async(req: RequestWithUser, res: Response, next: NextFunction) => {
   //retrieve all posts from the db
-  const allComments = await blogComment.find().sort({timestamp: 1})
+  const allComments = await blogComment.find().sort({timestamp: 1}).exec();
   console.log(JSON.stringify(allComments));
 
   //return them as a JSON object
@@ -58,25 +58,33 @@ export const comments_post: AsyncRequestHandler = asyncHandler(async(req: Reques
 
 //updates a comment
 export const comments_modify: AsyncRequestHandler = asyncHandler(async (req: RequestWithUser, res: Response, next: NextFunction) => {
-  const commentID = req.params.id;
-  const update = req.body;
-  const updatedComment = await blogComment.findByIdAndUpdate(commentID, update, {new: true});
+  if(req.user === await blogComment.findByID(req.params.commentId).user || req.user.admin === true){
+    const commentID = req.params.id;
+    const update = req.body;
+    const updatedComment = await blogComment.findByIdAndUpdate(commentID, update, {new: true});
 
-  if (!updatedComment) {
-    return res.status(404).json({success: false, message: 'Comment not found'})
+    if (!updatedComment) {
+      return res.status(404).json({success: false, message: 'Comment not found'})
+    }
+
+    res.status(200).json(updatedComment)
+  } else {
+    res.status(403).json({error: 'Forbodden: You are not authorized to modify this comment'});
   }
-
-  res.status(200).json(updatedComment)
 })
 
 //deletes a comment
 export const comments_delete: AsyncRequestHandler= asyncHandler(async (req: RequestWithUser, res: Response, next: NextFunction) => {
-  const deletedComment = await blogComment.findByIdAndDelete(req.params.id);
+  if(req.user === await blogComment.findByID(req.params.commentId).user || req.user.admin === true){
+    const deletedComment = await blogComment.findByIdAndDelete(req.params.id);
 
-  if(!deletedComment){
-    res.status(404).json({success: false, message: 'Comment not found'})
+    if(!deletedComment){
+      res.status(404).json({success: false, message: 'Comment not found'})
+    }
+    res.status(200).json(deletedComment);
+  } else {
+    res.status(403).json({error: 'Forbodden: You are not authorized to delete this comment'});
   }
-  res.status(200).json(deletedComment);
 })
 
 // hidden: {type: Boolean, required, default: false},

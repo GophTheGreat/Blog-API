@@ -6,11 +6,31 @@ const app = require('../app');
 
 describe('postController', () => {
   let adminToken;
+  let userToken;
   let post2id;
   describe('posts_post', () => {
     beforeAll(async() => {
       let admin = await User.findOne({username: "testAdmin"}).exec()
       //If there's no admin account, create one and log in
+      await request(app) 
+        .post('/api/users/')
+        .send({
+          username: "testUser",
+          password: "aAsSdDfF1!",
+          confirmPassword: "aAsSdDfF1!",
+          admin: false
+        })
+        .expect(201)
+
+      const userResponse = await request(app)
+        .post('/api/users/login')
+        .send({
+          username: "testUser",
+          password: "aAsSdDfF1!"
+        })
+        .expect(200)
+      userToken = userResponse.body.token
+
       if(!admin) {
         console.log('No admin account. Creating')
         admin = {        
@@ -24,18 +44,17 @@ describe('postController', () => {
           .send(admin)
           .expect(201);
       };
-      const token = await request(app)
+      const adminResponse = await request(app)
         .post('/api/users/login')
         .send({
           username: "testAdmin",
           password: "aAsSdDfF1!",
         })
         .expect(200)
-      adminToken = token.body.token;
+      adminToken = adminResponse.body.token;
     })
 
     it('makes several new posts', async() => {
-
       console.log(`My admin token is still: `+adminToken);
       let res = await request(app)
         .post('/api/posts')
@@ -88,6 +107,18 @@ describe('postController', () => {
         content: 'Content 3'
       }));
     });
+    it('should prevent a normal user from posting', async() => {
+      res = await request(app)
+        .post('/api/posts')
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({
+          title: 'Test Post Fail', 
+          content: 'Content Fail', 
+          datewritten: Date.now(), 
+          datepublished: Date.now()
+        })
+        .expect(403)
+    })
   });
   describe('posts_getAll', () => {
     it('should return all posts', async() => {
@@ -128,10 +159,25 @@ describe('postController', () => {
       expect(response).toEqual(expect.objectContaining({title: 'Test Post 2 modified', content: 'Content 2 modified'}));
 
     })
+    it('should prevent a normal user from modifying', async() => {
+      res = await request(app)
+        .put(`/api/posts/${post2id}`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({
+          title: 'Test Post 2 modified', 
+          content: 'Content 2 modified', 
+        })
+        .expect(403)
+    })
   })
   describe('posts_delete', () => {
+    it('should prevent a normal user from deleting post 2', async() => {
+      res = await request(app)
+        .delete(`/api/posts/${post2id}`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .expect(403)
+    })
     it('should delete post 2', async() => {
-      
       await request(app)
         .delete(`/api/posts/${post2id}`)
         .set('Authorization', `Bearer ${adminToken}`)

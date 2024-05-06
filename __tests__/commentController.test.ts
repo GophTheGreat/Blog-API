@@ -50,9 +50,8 @@ describe('CommentController', () => {
       content: 'Content'
     }));
   })
-
   describe('comments_post', () => {
-    it('should create a new comment', async() => {
+    it('should create 2 new comments', async() => {
       console.log("postId:", postId);
       let response = await request(app)
         .post(`/api/posts/${postId}/comments/`)
@@ -65,11 +64,34 @@ describe('CommentController', () => {
       expect(response.body).toEqual(expect.objectContaining({
         content: 'this is test comment content'
       }))
+
+      response = await request(app)
+        .post(`/api/posts/${postId}/comments/`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          content: 'this is another test comment content' 
+        })
+        .expect(201)
+
+      expect(response.body).toEqual(expect.objectContaining({
+        content: 'this is another test comment content' 
+      }))
     })
   })
   describe('comments_getAll', () => {
-    // let response = await request(app)
-    //   .get('/api/comments/:id')
+    it('should list all comments', async() => {
+      let response = await request(app)
+        .get(`/api/posts/${postId}/comments/`)
+
+      expect(response.body).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          content: 'this is another test comment content' 
+        }),
+        expect.objectContaining({
+          content: 'this is test comment content' 
+        })
+      ]))
+    })
   })
   describe('comments_', () => {
     

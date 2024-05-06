@@ -54,26 +54,37 @@ exports.posts_post = async (req, res, next) => {
 
 //modify an existing post
 exports.posts_modify = asyncHandler(async (req, res, next) => {
-  const postID = req.params.id;
-  const update = req.body;
-  const updatedPost = await Post.findByIdAndUpdate(postID, update, {new: true});
-
-  if (!updatedPost) {
-    return res.status(404).json({ success: false, message: 'Post not found' });
+  if (req.user.admin === true){
+    const postID = req.params.id;
+    const update = req.body;
+    const updatedPost = await Post.findByIdAndUpdate(postID, update, {new: true});
+  
+    if (!updatedPost) {
+      return res.status(404).json({ success: false, message: 'Post not found' });
+    }
+  
+    res.status(201).json(updatedPost);
+  } else {
+    console.log("User is not an admin!")
+    res.status(403).json({error: 'Forbodden: You are not authorized to modify posts'})
   }
-
-  res.status(201).json(updatedPost);
 });
 
 //delete a post
 exports.posts_delete = asyncHandler(async (req, res, next) => {
-  const deletedPost = await Post.findByIdAndDelete(req.params.id)
+  if (req.user.admin === true){
+    const deletedPost = await Post.findByIdAndDelete(req.params.id)
 
-  if(!deletedPost){
-    return res.status(404).json({success: false, message: 'Post not found'})
+    if(!deletedPost){
+      return res.status(404).json({success: false, message: 'Post not found'})
+    }
+
+    res.status(200).json(deletedPost);
+  } else {
+    console.log("User is not an admin!")
+    res.status(403).json({error: 'Forbodden: You are not authorized to delete posts'})
   }
 
-  res.status(200).json(deletedPost);
 })
 
 

@@ -17,9 +17,9 @@ router.post('/:postId/comments', authenticateJWT, comment_controller.comments_po
 router.post('/:postId/comments/:commentId', comment_controller.comments_getOne);
 
 ////PUT comment
-router.put('/:postId/comments/:commentId', comment_controller.comments_modify);
+router.put('/:postId/comments/:commentId', authenticateJWT, comment_controller.comments_modify);
 
 ////DELETE comment
-router.delete('/:postId/comments/:commentId', comment_controller.comments_delete);
+router.delete('/:postId/comments/:commentId', authenticateJWT, comment_controller.comments_delete);
 
 module.exports = router;

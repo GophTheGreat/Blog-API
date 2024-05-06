@@ -15,7 +15,7 @@ const asyncHandler = require("express-async-handler");
 //returns a JSON object of all comments
 exports.comments_getAll = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     //retrieve all posts from the db
-    const allComments = yield blogComment.find().sort({ timestamp: 1 });
+    const allComments = yield blogComment.find().sort({ timestamp: 1 }).exec();
     console.log(JSON.stringify(allComments));
     //return them as a JSON object
     res.json(allComments);
@@ -37,8 +37,10 @@ exports.comments_post = asyncHandler((req, res, next) => __awaiter(void 0, void 
         content: req.body.content,
         timestamp: Date.now()
     });
+    console.log(newComment);
     try {
         const savedComment = yield newComment.save();
+        console.log("comment was saved!", savedComment);
         res.status(201).json(savedComment);
     }
     catch (error) {
@@ -48,21 +50,31 @@ exports.comments_post = asyncHandler((req, res, next) => __awaiter(void 0, void 
 }));
 //updates a comment
 exports.comments_modify = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const commentID = req.params.id;
-    const update = req.body;
-    const updatedComment = yield blogComment.findByIdAndUpdate(commentID, update, { new: true });
-    if (!updatedComment) {
-        return res.status(404).json({ success: false, message: 'Comment not found' });
+    if (req.user === (yield blogComment.findByID(req.params.commentId).user) || req.user.admin === true) {
+        const commentID = req.params.id;
+        const update = req.body;
+        const updatedComment = yield blogComment.findByIdAndUpdate(commentID, update, { new: true });
+        if (!updatedComment) {
+            return res.status(404).json({ success: false, message: 'Comment not found' });
+        }
+        res.status(200).json(updatedComment);
     }
-    res.status(200).json(updatedComment);
+    else {
+        res.status(403).json({ error: 'Forbodden: You are not authorized to modify this comment' });
+    }
 }));
 //deletes a comment
 exports.comments_delete = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const deletedComment = yield blogComment.findByIdAndDelete(req.params.id);
-    if (!deletedComment) {
-        res.status(404).json({ success: false, message: 'Comment not found' });
+    if (req.user === (yield blogComment.findByID(req.params.commentId).user) || req.user.admin === true) {
+        const deletedComment = yield blogComment.findByIdAndDelete(req.params.id);
+        if (!deletedComment) {
+            res.status(404).json({ success: false, message: 'Comment not found' });
+        }
+        res.status(200).json(deletedComment);
     }
-    res.status(200).json(deletedComment);
+    else {
+        res.status(403).json({ error: 'Forbodden: You are not authorized to delete this comment' });
+    }
 }));
 // hidden: {type: Boolean, required, default: false},
 // username: {type: String, required, default: "anonymous"},
