@@ -14,7 +14,7 @@ router.get('/:postId/comments', comment_controller.comments_getAll);
 router.post('/:postId/comments', authenticateJWT, comment_controller.comments_post);
 
 ////GET single comment
-router.post('/:postId/comments/:commentId', comment_controller.comments_getOne);
+router.get('/:postId/comments/:commentId', comment_controller.comments_getOne);
 
 ////PUT comment
 router.put('/:postId/comments/:commentId', authenticateJWT, comment_controller.comments_modify);

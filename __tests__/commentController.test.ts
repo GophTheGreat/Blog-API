@@ -72,6 +72,8 @@ describe('CommentController', () => {
           content: 'this is another test comment content' 
         })
         .expect(201)
+      //save the comment id for later
+      comment2Id = response.body._id;
 
       expect(response.body).toEqual(expect.objectContaining({
         content: 'this is another test comment content' 
@@ -93,13 +95,45 @@ describe('CommentController', () => {
       ]))
     })
   })
-  describe('comments_', () => {
-    
+  describe('comments_getOne', () => {
+    it('should get one comment', async() => {
+      console.log(comment2Id);
+      let response = await request(app)
+        .get(`/api/posts/${postId}/comments/${comment2Id}`)
+
+      expect(response.body).toEqual(expect.objectContaining({
+        content: 'this is another test comment content'
+      }))
+    })
   })
-  describe('comments_', () => {
-    
+  describe('comments_modify', () => {
+    it('should modify one comment', async() => {
+      await request(app)
+        .put(`/api/posts/${postId}/comments/${comment2Id}`)
+        .set(`Authorization`, `Bearer ${adminToken}`)
+        .send({
+          content: 'this is a modified test comment content'
+        })
+        .expect(200);
+      
+      let response = await request(app)
+        .get(`/api/posts/${postId}/comments/${comment2Id}`)
+
+      expect(response.body).toEqual(expect.objectContaining({
+        content: 'this is a modified test comment content'
+      }))
+    })
   })
-  describe('comments_', () => {
-    
+  describe('comments_delete', () => {
+    it('should delete one comment', async() => {
+      await request(app)
+        .delete(`/api/posts/${postId}/comments/${comment2Id}`)
+        .set(`Authorization`, `Bearer ${adminToken}`)
+        .expect(200)
+
+      await request(app)
+        .get(`/api/posts/${postId}/comments/${comment2Id}`)
+        .expect(500)
+    })
   })
 })

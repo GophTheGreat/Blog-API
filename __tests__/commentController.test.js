@@ -78,6 +78,8 @@ describe('CommentController', () => {
                 content: 'this is another test comment content'
             })
                 .expect(201);
+            //save the comment id for later
+            comment2Id = response.body._id;
             expect(response.body).toEqual(expect.objectContaining({
                 content: 'this is another test comment content'
             }));
@@ -97,10 +99,41 @@ describe('CommentController', () => {
             ]));
         }));
     });
-    describe('comments_', () => {
+    describe('comments_getOne', () => {
+        it('should get one comment', () => __awaiter(void 0, void 0, void 0, function* () {
+            console.log(comment2Id);
+            let response = yield request(app)
+                .get(`/api/posts/${postId}/comments/${comment2Id}`);
+            expect(response.body).toEqual(expect.objectContaining({
+                content: 'this is another test comment content'
+            }));
+        }));
     });
-    describe('comments_', () => {
+    describe('comments_modify', () => {
+        it('should modify one comment', () => __awaiter(void 0, void 0, void 0, function* () {
+            yield request(app)
+                .put(`/api/posts/${postId}/comments/${comment2Id}`)
+                .set(`Authorization`, `Bearer ${adminToken}`)
+                .send({
+                content: 'this is a modified test comment content'
+            })
+                .expect(200);
+            let response = yield request(app)
+                .get(`/api/posts/${postId}/comments/${comment2Id}`);
+            expect(response.body).toEqual(expect.objectContaining({
+                content: 'this is a modified test comment content'
+            }));
+        }));
     });
-    describe('comments_', () => {
+    describe('comments_delete', () => {
+        it('should delete one comment', () => __awaiter(void 0, void 0, void 0, function* () {
+            yield request(app)
+                .delete(`/api/posts/${postId}/comments/${comment2Id}`)
+                .set(`Authorization`, `Bearer ${adminToken}`)
+                .expect(200);
+            yield request(app)
+                .get(`/api/posts/${postId}/comments/${comment2Id}`)
+                .expect(200);
+        }));
     });
 });

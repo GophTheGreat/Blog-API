@@ -25,7 +25,12 @@ export const comments_getAll: AsyncRequestHandler = asyncHandler(async(req: Requ
 
 //returns a JSON object of one comment
 export const comments_getOne: AsyncRequestHandler = asyncHandler(async(req: RequestWithUser, res: Response, next: NextFunction) => {
-  res.json(await blogComment.findByID(req.params.id));
+  console.log('searching for comment of id: ',req.params.commentId)
+  let comment = await blogComment.findById(req.params.commentId).exec()
+  if (!comment){
+    res.status(500)
+  }
+  res.status(200).json(comment);
 })
 
 //creates a comment
@@ -58,25 +63,31 @@ export const comments_post: AsyncRequestHandler = asyncHandler(async(req: Reques
 
 //updates a comment
 export const comments_modify: AsyncRequestHandler = asyncHandler(async (req: RequestWithUser, res: Response, next: NextFunction) => {
-  if(req.user === await blogComment.findByID(req.params.commentId).user || req.user.admin === true){
-    const commentID = req.params.id;
+  console.log("Attempting to modify comment: ",req.params.commentId)
+  console.log(req.user)
+  if(req.user === await blogComment.findById(req.params.commentId).author || req.user.admin === true){
+    console.log("user is verified")
+    const commentID = req.params.commentId;
     const update = req.body;
     const updatedComment = await blogComment.findByIdAndUpdate(commentID, update, {new: true});
 
     if (!updatedComment) {
       return res.status(404).json({success: false, message: 'Comment not found'})
     }
+    console.log(updatedComment);
 
     res.status(200).json(updatedComment)
   } else {
-    res.status(403).json({error: 'Forbodden: You are not authorized to modify this comment'});
+    res.status(403).json({error: 'Forbidden: You are not authorized to modify this comment'});
   }
 })
 
 //deletes a comment
 export const comments_delete: AsyncRequestHandler= asyncHandler(async (req: RequestWithUser, res: Response, next: NextFunction) => {
-  if(req.user === await blogComment.findByID(req.params.commentId).user || req.user.admin === true){
-    const deletedComment = await blogComment.findByIdAndDelete(req.params.id);
+  console.log("Attempting to delete comment: ",req.params.commentId);
+  if(req.user === await blogComment.findById(req.params.commentId).author || req.user.admin === true){
+    console.log("user is verified")
+    const deletedComment = await blogComment.findByIdAndDelete(req.params.commentId);
 
     if(!deletedComment){
       res.status(404).json({success: false, message: 'Comment not found'})

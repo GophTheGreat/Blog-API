@@ -22,7 +22,12 @@ exports.comments_getAll = asyncHandler((req, res, next) => __awaiter(void 0, voi
 }));
 //returns a JSON object of one comment
 exports.comments_getOne = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    res.json(yield blogComment.findByID(req.params.id));
+    console.log('searching for comment of id: ', req.params.commentId);
+    let comment = yield blogComment.findById(req.params.commentId).exec();
+    if (!comment) {
+        res.status(500);
+    }
+    res.status(200).json(comment);
 }));
 //creates a comment
 exports.comments_post = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -50,23 +55,29 @@ exports.comments_post = asyncHandler((req, res, next) => __awaiter(void 0, void 
 }));
 //updates a comment
 exports.comments_modify = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    if (req.user === (yield blogComment.findByID(req.params.commentId).user) || req.user.admin === true) {
-        const commentID = req.params.id;
+    console.log("Attempting to modify comment: ", req.params.commentId);
+    console.log(req.user);
+    if (req.user === (yield blogComment.findById(req.params.commentId).author) || req.user.admin === true) {
+        console.log("user is verified");
+        const commentID = req.params.commentId;
         const update = req.body;
         const updatedComment = yield blogComment.findByIdAndUpdate(commentID, update, { new: true });
         if (!updatedComment) {
             return res.status(404).json({ success: false, message: 'Comment not found' });
         }
+        console.log(updatedComment);
         res.status(200).json(updatedComment);
     }
     else {
-        res.status(403).json({ error: 'Forbodden: You are not authorized to modify this comment' });
+        res.status(403).json({ error: 'Forbidden: You are not authorized to modify this comment' });
     }
 }));
 //deletes a comment
 exports.comments_delete = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    if (req.user === (yield blogComment.findByID(req.params.commentId).user) || req.user.admin === true) {
-        const deletedComment = yield blogComment.findByIdAndDelete(req.params.id);
+    console.log("Attempting to delete comment: ", req.params.commentId);
+    if (req.user === (yield blogComment.findById(req.params.commentId).author) || req.user.admin === true) {
+        console.log("user is verified");
+        const deletedComment = yield blogComment.findByIdAndDelete(req.params.commentId);
         if (!deletedComment) {
             res.status(404).json({ success: false, message: 'Comment not found' });
         }
