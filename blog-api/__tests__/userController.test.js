@@ -57,31 +57,4 @@ describe('userController', () => {
       expect(loginResponse.body.token).toBeTruthy();
     })
   })
-  describe("users_logout", () => {
-    it('should log us out', async() => {
-      await request(app)
-        .post('/api/users/logout')
-        .expect(200)
-    })
-  })
-  describe("users_login", () => {
-    it('login should succeed after logging out', async() => {
-      const user = {
-        username: "testNormie",
-        password: "aAsSdDfF1!"
-      }
-      
-      const loginResponse = await request(app)
-        .post('/api/users/login')
-        .send(user)
-        .expect(200)
-
-      token = loginResponse.body.token;
-
-      expect(loginResponse.body.token).toBeTruthy();
-      await request(app)
-        .post('/api/users/logout')
-        .expect(200);
-    })
-  })
 });

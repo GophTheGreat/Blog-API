@@ -57,26 +57,16 @@ exports.users_create = [
 
 exports.users_login = asyncHandler(async (req, res, next) => {
   passport.authenticate('local', async (err, user, info) => {
+    const expiresIn = 3600; //Expires in 1 hour
     try {
       if(err || !user) {
         const error = new Error('An error occurred');
         return next(error);
       }
-      const token = jwt.sign({user}, process.env.SECRETKEY)
+      const token = jwt.sign({user}, process.env.SECRETKEY, {expiresIn})
       return res.status(200).json({ token });
     } catch (err){
       return next(err);
     }
   })(req, res, next);
 });
-
-//POST for logging out
-exports.users_logout = asyncHandler((req, res, next) => {
-    req.logout((err) => {
-      if (err) {
-        return next(err);
-      };
-      res.status(200).send("Logged out successfully"); // Respond with a success message
-    })
-});
-

@@ -1,2 +1,6 @@
-.env
-/node_modules
+/blog-api/node_modules/
+/blog-api/.env
+/frontend-post/node_modules/
+/frontend-post/.env
+/frontend-comment/node_modules/
+/frontend-comment/.env

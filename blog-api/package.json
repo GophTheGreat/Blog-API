@@ -9,6 +9,9 @@
   "jest": {
     "setupFilesAfterEnv": [
       "./jest.setup.js"
+    ],
+    "testPathIgnorePatterns": [
+      "/*.test.ts"
     ]
   },
   "dependencies": {
