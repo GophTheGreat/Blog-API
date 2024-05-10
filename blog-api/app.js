@@ -14,6 +14,7 @@ const bcrypt = require('bcrypt');
 const session = require("express-session");
 const JWTStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
+const cors = require('cors');
 
 var app = express();
 
@@ -36,8 +37,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(cors);
 app.use(passport.initialize());
+
 
 passport.use(
   new LocalStrategy(async (username, password, done) => {
