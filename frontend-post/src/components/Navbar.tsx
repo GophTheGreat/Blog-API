@@ -11,6 +11,7 @@ function Navbar(): ReactNode {
     return (
       <div className="navbar">
         <Link to='/login'>Log in</Link>
+        <Link to='/register'>Register</Link>
       </div>
     )
   }
