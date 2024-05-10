@@ -39,7 +39,7 @@ exports.users_create = [
     })
 
     console.log(newUser);
-
+    console.log("Errors: ",errors);
     if(!errors.isEmpty()) {
       return res.status(400).json({errors: errors.array()});
     }
