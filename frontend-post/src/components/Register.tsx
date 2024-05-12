@@ -1,7 +1,8 @@
 import { FormEvent, ReactNode } from "react";
-import { redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function Register():ReactNode {
+  const navigate = useNavigate();
 
   async function handleRegister(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -10,7 +11,7 @@ function Register():ReactNode {
     const password = formData.get("password")
     const confirmPassword = formData.get("confirmPassword")
     const admin = formData.get("admin") === 'on';
-
+   
     //first compare that the passwords match
     if(password === confirmPassword){
       const body = JSON.stringify({
@@ -27,8 +28,10 @@ function Register():ReactNode {
         },
         body: body
       })
+      console.log(response);
       if(response.ok){
-        return redirect('/login')
+        console.log('redirectiong');
+        navigate('/login');
       } else {
         //Handle the error response
         console.log(response.json());

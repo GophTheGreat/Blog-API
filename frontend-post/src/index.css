@@ -70,7 +70,16 @@ button:focus-visible {
   }
 }
 
+#root{
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  grid-template-rows: 10% auto;
+}
+
 .navbar {
+  display: flex;
+  flex-direction: column;
   justify-self: flex-end;
 }
 
@@ -96,4 +105,9 @@ button:focus-visible {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+}
+
+.postContainer form{
+  display: flex;
+  flex-direction: column;
 }

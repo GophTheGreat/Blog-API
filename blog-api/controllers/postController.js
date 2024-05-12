@@ -32,7 +32,6 @@ exports.posts_post = async (req, res, next) => {
     //Create a new post object
     const newPost = new Post({
       title: req.body.title,
-      public: req.body.public,
       content: req.body.content,
       hidden: req.body.hidden,
       datepublished: req.body.datepublished,
