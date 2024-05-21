@@ -1,12 +1,15 @@
 A backend and two frontends
 
 https://blog-api-goph.fly.dev 
+
 https://frontend-comment-goph.fly.dev
+
 https://frontend-post-goph.fly.dev 
 
 API:
 
-~POSTS~
+POSTS
+
 ////GET all posts
 https://blog-api-goph.fly.dev/api/posts/
 
@@ -23,7 +26,9 @@ https://blog-api-goph.fly.dev/api/posts/:postId
 https://blog-api-goph.fly.dev/api/posts/:postId
 
 ----------
-~COMMENTS~
+
+COMMENTS
+
 ////GET all comments
 https://blog-api-goph.fly.dev/api/posts/:postId/comments
 
@@ -38,11 +43,15 @@ https://blog-api-goph.fly.dev/api/posts/:postId/comments/:postId/comments/:comme
 
 ////DELETE comment
 https://blog-api-goph.fly.dev/api/posts/:postId/comments/:postId/comments/:commentId
+
 ----------
-~USERS~
+
+USERS
+
 ///POST create a user
 https://blog-api-goph.fly.dev/api/users
 
 ///POST log in
 https://blog-api-goph.fly.dev/api/users/login
+
 ----------
