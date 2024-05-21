@@ -16,7 +16,7 @@ interface RequestWithUser extends ExpressRequest{
 //returns a JSON object of all comments
 export const comments_getAll: AsyncRequestHandler = asyncHandler(async(req: RequestWithUser, res: Response, next: NextFunction) => {
   //retrieve all posts from the db
-  const allComments = await blogComment.find().sort({timestamp: 1}).exec();
+  const allComments = await blogComment.find().sort({timestamp: 1}).populate('author', 'username').exec();
   console.log(JSON.stringify(allComments));
 
   //return them as a JSON object
@@ -26,7 +26,7 @@ export const comments_getAll: AsyncRequestHandler = asyncHandler(async(req: Requ
 //returns a JSON object of one comment
 export const comments_getOne: AsyncRequestHandler = asyncHandler(async(req: RequestWithUser, res: Response, next: NextFunction) => {
   console.log('searching for comment of id: ',req.params.commentId)
-  let comment = await blogComment.findById(req.params.commentId).exec()
+  let comment = await blogComment.findById(req.params.commentId).populate('author', 'username').exec()
   if (!comment){
     res.status(500)
   }
