@@ -26,7 +26,7 @@ export const comments_getAll: AsyncRequestHandler = asyncHandler(async(req: Requ
 //returns a JSON object of one comment
 export const comments_getOne: AsyncRequestHandler = asyncHandler(async(req: RequestWithUser, res: Response, next: NextFunction) => {
   console.log('searching for comment of id: ',req.params.commentId)
-  let comment = await blogComment.findById(req.params.commentId).populate('author', 'username').exec()
+  let comment = await blogComment.findById(req.params.commentId).populate('author', 'username').exec();
   if (!comment){
     res.status(500)
   }
@@ -44,7 +44,7 @@ export const comments_post: AsyncRequestHandler = asyncHandler(async(req: Reques
   const newComment = new blogComment({
     hidden: false,
     post: req.params.postId,
-    author: req.user,
+    author: req.user._id,
     content: req.body.content,
     timestamp: Date.now()
   })

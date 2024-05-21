@@ -133,7 +133,7 @@ describe('CommentController', () => {
                 .expect(200);
             yield request(app)
                 .get(`/api/posts/${postId}/comments/${comment2Id}`)
-                .expect(200);
+                .expect(500);
         }));
     });
 });

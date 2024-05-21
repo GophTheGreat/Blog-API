@@ -15,7 +15,7 @@ const asyncHandler = require("express-async-handler");
 //returns a JSON object of all comments
 exports.comments_getAll = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     //retrieve all posts from the db
-    const allComments = yield blogComment.find().sort({ timestamp: 1 }).exec();
+    const allComments = yield blogComment.find().sort({ timestamp: 1 }).populate('author', 'username').exec();
     console.log(JSON.stringify(allComments));
     //return them as a JSON object
     res.json(allComments);
@@ -23,7 +23,7 @@ exports.comments_getAll = asyncHandler((req, res, next) => __awaiter(void 0, voi
 //returns a JSON object of one comment
 exports.comments_getOne = asyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('searching for comment of id: ', req.params.commentId);
-    let comment = yield blogComment.findById(req.params.commentId).exec();
+    let comment = yield blogComment.findById(req.params.commentId).populate('author', 'username').exec();
     if (!comment) {
         res.status(500);
     }
@@ -38,7 +38,7 @@ exports.comments_post = asyncHandler((req, res, next) => __awaiter(void 0, void 
     const newComment = new blogComment({
         hidden: false,
         post: req.params.postId,
-        author: req.user,
+        author: req.user._id,
         content: req.body.content,
         timestamp: Date.now()
     });

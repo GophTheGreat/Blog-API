@@ -27,7 +27,7 @@ function Feed():ReactNode {
         <div className="post" key={post._id}> 
           <hr/>
           <b>{post.title}</b>
-          <textarea name="" id="" cols={30} rows={10} disabled>{post.content}</textarea>
+          <textarea name="" id="" cols={30} rows={10} disabled defaultValue={post.content}></textarea>
           <Link to={`/posts/${post._id}`}>See Post and Comments</Link>
           <hr/>
         </div>
